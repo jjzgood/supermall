@@ -37,7 +37,7 @@ export default {
   },
   methods: {
     itemClick() {
-      console.log(this.$route);
+      // console.log(this.$route);
       if (this.$route.path == this.path) {
         return this.path;
       }
