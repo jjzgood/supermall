@@ -10,7 +10,7 @@ export function getHomeMultidata() {
 
 export function getHomeGoods(type, page) {
     return request({
-        url: 'xxxxx',
+        url: '/api/n3/home/data',
         params: {
             type,
             page

@@ -4,10 +4,11 @@
       <div slot="center">购物车</div>
     </nav-bar>
     <scroll
-      class="contentt"
+      class="content"
       ref="scroll"
       :probe-type="3"
       @scroll="contentScroll"
+      :pull-up-load="true"
       @pullingUp="loadMore"
     >
       <home-swiper :banners="banners" />
@@ -32,6 +33,7 @@ import TabControl from "components/content/tabControl/TabControl";
 import BackTop from "components/content/backTop/BackTop";
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
+import { debounce } from "common/utils";
 
 export default {
   name: "Home",
@@ -59,10 +61,21 @@ export default {
     };
   },
   created() {
+    //  请求过的数据
     this.getHomeMultidata();
+
+    // 请求商品列表
     this.getHomeGoods("pop");
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
+  },
+
+  mounted() {
+    // 3. 监听item中图片加载完成
+    const refresh = debounce(this.$refs.scroll.refresh, 200);
+    this.$bus.$on("itemImageLoad", () => {
+      refresh();
+    });
   },
   computed: {
     showgoods() {
@@ -73,6 +86,7 @@ export default {
     /**
      * 事件相关
      */
+
     tabClick(index) {
       //  console.log(index);
       this.currentType = Object.keys(this.goods)[index];
@@ -89,8 +103,9 @@ export default {
     },
 
     loadMore() {
-      this.getHomeMultidata(this.currentType);
-      this.$refs.scroll.scroll.refresh();
+      console.log("加载更多");
+      this.getHomeGoods(this.currentType);
+      // this.$refs.scroll.scroll.refresh();
     },
 
     /**
@@ -107,7 +122,9 @@ export default {
       getHomeGoods(type, page).then(res => {
         this.goods[type].list.push(...res.data.data.list);
         this.goods[type].page += 1;
+
         this.$refs.scroll.finishPullUp();
+
         // console.log(res);
       });
     }
@@ -118,9 +135,9 @@ export default {
 
 <style scoped>
 #home {
-  padding-top: 44px;
+  /* padding-top: 44px; */
   height: 100vh;
-  /* position: relative; */
+  position: relative;
 }
 
 .home-nav {
@@ -140,18 +157,17 @@ export default {
   z-index: 9;
 }
 
-/* .content {
+.content {
   position: absolute;
   top: 44px;
   bottom: 49px;
   left: 0;
   right: 0;
-  background-color: red;
-} */
+}
 
-.contentt {
+/*.content {
   height: calc(100%-93px);
   overflow: hidden;
-  /* margin-top: 44px; */
-}
+  margin-top: 44px;
+}*/
 </style>

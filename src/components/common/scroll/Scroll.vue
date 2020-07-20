@@ -28,14 +28,6 @@ export default {
       scroll: null
     };
   },
-  methods: {
-    scrollTo(x, y, time = 500) {
-      this.scroll.scrollTo(x, y, time);
-    },
-    finishPullUp() {
-      this.scroll.finishPullUp();
-    }
-  },
 
   mounted() {
     // 创建scroll对象
@@ -47,9 +39,10 @@ export default {
     });
 
     // this.scroll.refresh();
-    console.log(this.$refs.wrapper);
-    console.log(document.querySelector(".wrapper").offsetHeight);
-    console.log(document.querySelector(".content").offsetHeight);
+    // console.log(this.scroll);
+    // console.log(this.$refs.wrapper);
+    // console.log(document.querySelector(".wrapper").offsetHeight);
+    // console.log(document.querySelector(".content").offsetHeight);
 
     //监听滚动的位置
     this.scroll.on("scroll", position => {
@@ -62,8 +55,17 @@ export default {
     });
   },
 
-  updated() {
-    this.scroll.refresh();
+  methods: {
+    scrollTo(x, y, time = 300) {
+      this.scroll.scrollTo(x, y, time);
+    },
+    finishPullUp() {
+      this.scroll.finishPullUp();
+    },
+    refresh() {
+      console.log("--------");
+      this.scroll.refresh();
+    }
   }
 };
 </script>
