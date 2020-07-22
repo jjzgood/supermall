@@ -38,12 +38,6 @@ export default {
       pullUpLoad: this.pullUpLoad
     });
 
-    // this.scroll.refresh();
-    // console.log(this.scroll);
-    // console.log(this.$refs.wrapper);
-    // console.log(document.querySelector(".wrapper").offsetHeight);
-    // console.log(document.querySelector(".content").offsetHeight);
-
     //监听滚动的位置
     this.scroll.on("scroll", position => {
       this.$emit("scroll", position);
@@ -63,7 +57,6 @@ export default {
       this.scroll.finishPullUp();
     },
     refresh() {
-      console.log("--------");
       this.scroll.refresh();
     }
   }

@@ -55,6 +55,7 @@ export default {
 .tab-control-item span {
   padding: 5px;
 }
+
 .active {
   color: var(--color-high-text);
 }

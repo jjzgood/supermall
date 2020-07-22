@@ -3,6 +3,14 @@
     <nav-bar class="home-nav">
       <div slot="center">购物车</div>
     </nav-bar>
+    <tab-control
+      :titles="['流行','新款','精品']"
+      @tabClick="tabClick"
+      ref="tabControl1"
+      class="tab-control"
+      v-show="isTabFixed"
+    />
+
     <scroll
       class="content"
       ref="scroll"
@@ -11,10 +19,10 @@
       :pull-up-load="true"
       @pullingUp="loadMore"
     >
-      <home-swiper :banners="banners" />
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad" />
       <recommend-view :recommends="recommends" />
       <feature-view />
-      <tab-control class="tab-control" :titles="['流行','新款','精品']" @tabClick="tabClick" />
+      <tab-control :titles="['流行','新款','精品']" @tabClick="tabClick" ref="tabControl2" />
       <goods-list :goods="showgoods" />
     </scroll>
     <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
@@ -57,7 +65,10 @@ export default {
         sell: { page: 0, list: [] }
       },
       currentType: "pop",
-      isShowBackTop: false
+      isShowBackTop: false,
+      tabOffsetTop: 0,
+      isTabFixed: false,
+      saveY: 0
     };
   },
   created() {
@@ -71,7 +82,7 @@ export default {
   },
 
   mounted() {
-    // 3. 监听item中图片加载完成
+    // 监听item中图片加载完成
     const refresh = debounce(this.$refs.scroll.refresh, 200);
     this.$bus.$on("itemImageLoad", () => {
       refresh();
@@ -82,14 +93,26 @@ export default {
       return this.goods[this.currentType].list;
     }
   },
+
+  // // 离开时记录状态和位置，实际测试中没有此问题（新版本better-scroll）
+  // activated() {
+  //   // console.log("active......", this.saveY);
+  //   this.$refs.scroll.scrollTo(0, this.saveY);
+  // },
+  // deactivated() {
+  //   // console.log("deactive......:", this.$refs.scroll.scroll.y);
+  //   this.saveY = this.$refs.scroll.scroll.y;
+  //   this.$refs.scroll.refresh();
+  // },
   methods: {
     /**
      * 事件相关
      */
-
     tabClick(index) {
       //  console.log(index);
       this.currentType = Object.keys(this.goods)[index];
+      this.$refs.tabControl1.currentIndex = index;
+      this.$refs.tabControl2.currentIndex = index;
     },
 
     backClick() {
@@ -100,14 +123,20 @@ export default {
     contentScroll(position) {
       // console.log(position.y);
       this.isShowBackTop = -position.y > 1000;
+
+      this.isTabFixed = -position.y > this.tabOffsetTop;
     },
 
     loadMore() {
-      console.log("加载更多");
+      // console.log("加载更多");
       this.getHomeGoods(this.currentType);
       // this.$refs.scroll.scroll.refresh();
     },
 
+    swiperImageLoad() {
+      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
+      console.log(this.tabOffsetTop);
+    },
     /**
      * 网络请求相关
      */
@@ -144,25 +173,29 @@ export default {
   background-color: var(--color-tint);
   color: #fff;
 
-  position: fixed;
+  /* position: fixed;
   left: 0;
   right: 0;
   top: 0;
-  z-index: 9;
+  z-index: 9; */
 }
 
-.tab-control {
+/* .tab-control {
   position: sticky;
   top: 44px;
   z-index: 9;
+} */
+.tab-control {
+  position: relative;
+  z-index: 9;
 }
-
 .content {
   position: absolute;
   top: 44px;
   bottom: 49px;
   left: 0;
   right: 0;
+  overflow: hidden;
 }
 
 /*.content {
