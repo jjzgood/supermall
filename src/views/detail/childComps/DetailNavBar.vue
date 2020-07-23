@@ -56,6 +56,6 @@ export default {
 }
 
 .back {
-  margin-top: 9px;
+  margin-top: 6px;
 }
 </style>
