@@ -1,13 +1,16 @@
 <template>
   <div id="detail">
-    <detail-nav-bar class="detail-nav" />
-    <scroll class="content" :pull-up-load="true" ref="scroll">
+    <detail-nav-bar class="detail-nav" @titleClick="titleClick" ref="nav" />
+    <scroll class="content" :pull-up-load="true" ref="scroll" @scroll="contentScroll">
       <detail-swiper :top-images="topImages" />
       <detail-base-info :goods="goods" />
       <detail-shop-info :shop="shop" />
       <detail-goods-info :detail-info="detailInfo" @imgLoad="imageLoad" />
-      <detail-param-info :param-info="paramInfo" />
+      <detail-param-info :param-info="paramInfo" ref="param" />
+      <detail-comment-info :comment-info="commentInfo" ref="comment" />
+      <goods-list :goods="recommends" ref="recommend" />
     </scroll>
+    <detail-bottom-bar />
   </div>
 </template>
 
@@ -18,10 +21,20 @@ import DetailBaseInfo from "./childComps/DetailBaseInfo";
 import DetailShopInfo from "./childComps/DetailShopInfo";
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
+import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import DetailBottomBar from "./childComps/DetailBottomBar";
 
 import Scroll from "components/common/scroll/Scroll";
+import GoodsList from "components/content/goods/GoodsList";
+import { debounce } from "common/utils";
 
-import { getDetail, Goods, Shop, GoodsParam } from "network/detail";
+import {
+  getDetail,
+  Goods,
+  Shop,
+  GoodsParam,
+  getRecommend
+} from "network/detail";
 
 export default {
   name: "Detail",
@@ -32,7 +45,10 @@ export default {
     DetailShopInfo,
     Scroll,
     DetailGoodsInfo,
-    DetailParamInfo
+    DetailParamInfo,
+    DetailCommentInfo,
+    GoodsList,
+    DetailBottomBar
   },
   data() {
     return {
@@ -41,12 +57,26 @@ export default {
       goods: {},
       shop: {},
       detailInfo: {},
-      paramInfo: {}
+      paramInfo: {},
+      commentInfo: {},
+      recommends: [],
+      themeTopYs: [],
+      getThemeTopY: null
     };
+  },
+
+  mounted() {
+    // 监听item中图片加载完成
+    const refresh = debounce(this.$refs.scroll.refresh, 200);
+    this.$bus.$on("detailImageLoad", () => {
+      refresh();
+    });
   },
   created() {
     // 保存iid
     this.iid = this.$route.params.iid;
+
+    // 请求详情数据
     getDetail(this.iid).then(res => {
       const data = res.data.result;
 
@@ -71,13 +101,54 @@ export default {
         data.itemParams.info,
         data.itemParams.rule
       );
-      // console.log(data);
+
+      // 获取评论信息
+      if (data.rate.cRate !== 0) {
+        this.commentInfo = data.rate.list[0];
+      }
+      console.log(data);
     });
+
+    // 请求推荐数据
+    getRecommend().then(res => {
+      this.recommends = res.data.data.list;
+    });
+
+    // 给getThemeTopY进行赋值
+    this.getThemeTopY = debounce(() => {
+      this.themeTopYs = [];
+      this.themeTopYs.push(0);
+      this.themeTopYs.push(this.$refs.param.$el.offsetTop - 44);
+      this.themeTopYs.push(this.$refs.comment.$el.offsetTop - 44);
+      this.themeTopYs.push(this.$refs.recommend.$el.offsetTop - 44);
+      console.log(this.themeTopYs);
+    }, 100);
   },
+
   methods: {
     imageLoad() {
       this.$refs.scroll.refresh();
-      console.log(document.querySelector(".content"));
+      // console.log(document.querySelector(".content"));
+      this.getThemeTopY();
+    },
+    titleClick(index) {
+      console.log(index);
+      this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 100);
+    },
+    contentScroll(position) {
+      // 获取y值
+      const positionY = -position.y;
+      const length = this.themeTopYs.length;
+      for (let i = 0; i < length; i++) {
+        if (
+          (i < length - 1 &&
+            positionY >= this.themeTopYs[i] &&
+            positionY < this.themeTopYs[i + 1]) ||
+          (i == length - 1 && positionY >= this.themeTopYs[i])
+        ) {
+          this.$refs.nav.currentIndex = i;
+        }
+      }
     }
   }
 };
@@ -98,6 +169,6 @@ export default {
 }
 
 .content {
-  height: calc(100% - 44px);
+  height: calc(100% - 44px - 49px);
 }
 </style>
