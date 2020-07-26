@@ -12,7 +12,7 @@
     </scroll>
     <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
 
-    <detail-bottom-bar />
+    <detail-bottom-bar @addCart="addCart" />
   </div>
 </template>
 
@@ -139,7 +139,7 @@ export default {
       this.getThemeTopY();
     },
     titleClick(index) {
-      console.log(index);
+      // console.log(index);
       this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 100);
     },
     // 回到顶部
@@ -165,6 +165,17 @@ export default {
           this.$refs.nav.currentIndex = i;
         }
       }
+    },
+    // 加入到购物车
+    addCart() {
+      const product = {};
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.price = this.goods.realPrice;
+      product.iid = this.iid;
+      // 加入到购物车
+      this.$store.dispatch("addCart", product);
     }
   }
 };
