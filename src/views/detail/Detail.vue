@@ -10,6 +10,8 @@
       <detail-comment-info :comment-info="commentInfo" ref="comment" />
       <goods-list :goods="recommends" ref="recommend" />
     </scroll>
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
+
     <detail-bottom-bar />
   </div>
 </template>
@@ -23,10 +25,12 @@ import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
 import DetailBottomBar from "./childComps/DetailBottomBar";
+// import BackTop from "components/content/backTop/BackTop";
 
 import Scroll from "components/common/scroll/Scroll";
 import GoodsList from "components/content/goods/GoodsList";
 import { debounce } from "common/utils";
+import { backTopMixin } from "common/mixin";
 
 import {
   getDetail,
@@ -49,7 +53,9 @@ export default {
     DetailCommentInfo,
     GoodsList,
     DetailBottomBar
+    // BackTop
   },
+  mixins: [backTopMixin],
   data() {
     return {
       iid: null,
@@ -62,6 +68,7 @@ export default {
       recommends: [],
       themeTopYs: [],
       getThemeTopY: null
+      // isShowBackTop: false
     };
   },
 
@@ -135,7 +142,16 @@ export default {
       console.log(index);
       this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 100);
     },
+    // 回到顶部
+    // backClick() {
+    //   console.log(this.$refs);
+    //   this.$refs.scroll.scrollTo(0, 0);
+    // },
+
     contentScroll(position) {
+      // 是否显示回到顶部
+      this.isShowBackTop = -position.y > 1000;
+
       // 获取y值
       const positionY = -position.y;
       const length = this.themeTopYs.length;

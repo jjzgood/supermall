@@ -42,6 +42,7 @@ import BackTop from "components/content/backTop/BackTop";
 
 import { getHomeMultidata, getHomeGoods } from "network/home";
 import { debounce } from "common/utils";
+import { backTopMixin } from "common/mixin";
 
 export default {
   name: "Home",
@@ -52,9 +53,10 @@ export default {
     FeatureView,
     TabControl,
     GoodsList,
-    Scroll,
-    BackTop
+    Scroll
+    // BackTop
   },
+  mixins: [backTopMixin],
   data() {
     return {
       banners: [],
@@ -65,7 +67,7 @@ export default {
         sell: { page: 0, list: [] }
       },
       currentType: "pop",
-      isShowBackTop: false,
+      // isShowBackTop: false,
       tabOffsetTop: 0,
       isTabFixed: false,
       saveY: 0
@@ -115,10 +117,11 @@ export default {
       this.$refs.tabControl2.currentIndex = index;
     },
 
-    backClick() {
-      console.log(this.$refs);
-      this.$refs.scroll.scrollTo(0, 0);
-    },
+    // 回到顶部
+    // backClick() {
+    //   console.log(this.$refs);
+    //   this.$refs.scroll.scrollTo(0, 0);
+    // },
 
     contentScroll(position) {
       // console.log(position.y);
