@@ -11,6 +11,7 @@
       <goods-list :goods="recommends" ref="recommend" />
     </scroll>
     <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
+    <!-- <toast :message="message" :show="show" /> -->
 
     <detail-bottom-bar @addCart="addCart" />
   </div>
@@ -32,6 +33,7 @@ import GoodsList from "components/content/goods/GoodsList";
 import { debounce } from "common/utils";
 import { backTopMixin } from "common/mixin";
 
+// import Toast from "components/common/toast/Toast";
 import {
   getDetail,
   Goods,
@@ -53,6 +55,7 @@ export default {
     DetailCommentInfo,
     GoodsList,
     DetailBottomBar
+    // Toast
     // BackTop
   },
   mixins: [backTopMixin],
@@ -68,6 +71,8 @@ export default {
       recommends: [],
       themeTopYs: [],
       getThemeTopY: null
+      // message: "",
+      // show: false
       // isShowBackTop: false
     };
   },
@@ -175,7 +180,11 @@ export default {
       product.price = this.goods.realPrice;
       product.iid = this.iid;
       // 加入到购物车
-      this.$store.dispatch("addCart", product);
+      this.$store.dispatch("addCart", product).then(res => {
+        // console.log(this.$toast);
+        // 显示弹窗提醒
+        this.$toast.show(res);
+      });
     }
   }
 };
