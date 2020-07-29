@@ -28,5 +28,6 @@ export default {
 .cart-nav {
   background-color: var(--color-tint);
   color: #fff;
+  border-bottom: 0.5px solid #fff;
 }
 </style>

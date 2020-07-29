@@ -96,7 +96,7 @@ export default {
     }
   },
 
-  // // 离开时记录状态和位置，实际测试中没有此问题（新版本better-scroll）
+  // 离开时记录状态和位置，实际测试中没有此问题（新版本better-scroll）
   // activated() {
   //   // console.log("active......", this.saveY);
   //   this.$refs.scroll.scrollTo(0, this.saveY);
@@ -111,7 +111,7 @@ export default {
      * 事件相关
      */
     tabClick(index) {
-      //  console.log(index);
+      // console.log(index);
       this.currentType = Object.keys(this.goods)[index];
       this.$refs.tabControl1.currentIndex = index;
       this.$refs.tabControl2.currentIndex = index;
